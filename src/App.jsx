@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useRef, useReducer, useCallback } from "react";
+import { useState, useRef, useReducer, useCallback, createContext, useMemo, memo } from "react";
 import Header from "./components/Header";
 import Editor from "./components/Editor";
 import List from "./components/List";
@@ -38,6 +38,9 @@ function reducer(state, action) {
   }
 }
 
+export const TodoStateContext = createContext();
+export const TodoDispatchContext = createContext();
+
 function App() {
   const [todos, dispatch] = useReducer(reducer, mockData);
   const idRef = useRef(3); // mockData와 겹치지 않게 3번부터 설정
@@ -68,11 +71,21 @@ function App() {
     });
   }, []);
 
+  // 생성된 후 다시 재생성 되지 않도록
+  // 컴포넌트가 리렌더링될 때마다 다시 생성되지 않도록 방지하기 위해 useMemo로 감싸줌
+  const memoizedDispatch = useMemo(() => {
+    return { onCreate, onUpdate, onDelete };
+  }, []);
+
   return (
     <div className="App">
       <Header />
-      <Editor onCreate={onCreate} />
-      <List todos={todos} onUpdate={onUpdate} onDelete={onDelete} />
+      <TodoStateContext.Provider value={todos}>
+        <TodoDispatchContext value={memoizedDispatch}>
+          <Editor />
+          <List />
+        </TodoDispatchContext>
+      </TodoStateContext.Provider>
     </div>
   );
 }
