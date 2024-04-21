@@ -81,10 +81,10 @@ function App() {
     <div className="App">
       <Header />
       <TodoStateContext.Provider value={todos}>
-        <TodoDispatchContext value={memoizedDispatch}>
+        <TodoDispatchContext.Provider value={memoizedDispatch}>
           <Editor />
           <List />
-        </TodoDispatchContext>
+        </TodoDispatchContext.Provider>
       </TodoStateContext.Provider>
     </div>
   );
